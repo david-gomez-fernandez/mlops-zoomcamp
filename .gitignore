@@ -1,3 +1,4 @@
 data/
 venv
 mlruns
+module-2/output/*
