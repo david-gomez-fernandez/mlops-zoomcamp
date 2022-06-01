@@ -14,10 +14,12 @@ def load_pickle(filename: str):
 
 def run(data_path):
 
-    X_train, y_train = load_pickle(os.path.join(data_path, "train.pkl"))
-    X_valid, y_valid = load_pickle(os.path.join(data_path, "valid.pkl"))
+    with mlflow.start_run():
 
-    with mlflow.run():
+        X_train, y_train = load_pickle(os.path.join(data_path, "train.pkl"))
+        X_valid, y_valid = load_pickle(os.path.join(data_path, "valid.pkl"))
+
+        # with mlflow.run():
 
         rf = RandomForestRegressor(max_depth=10, random_state=0)
         rf.fit(X_train, y_train)
@@ -27,6 +29,10 @@ def run(data_path):
 
 
 if __name__ == '__main__':
+
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    mlflow.set_experiment("module-2-experiment")
+    mlflow.sklearn.autolog()
 
     parser = argparse.ArgumentParser()
     parser.add_argument(

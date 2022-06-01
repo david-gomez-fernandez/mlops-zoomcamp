@@ -1,4 +1,6 @@
 data/
 venv
+.vscode
 mlruns
+mlflow.db
 module-2/output/*
