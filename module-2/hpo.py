@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
-mlflow.set_experiment("hyperopt-experiment")
+mlflow.set_experiment("random-forest-hyperopt")
 
 
 def load_pickle(filename):
