@@ -18,8 +18,7 @@ def run(data_path):
 
         X_train, y_train = load_pickle(os.path.join(data_path, "train.pkl"))
         X_valid, y_valid = load_pickle(os.path.join(data_path, "valid.pkl"))
-
-        # with mlflow.run():
+       
 
         rf = RandomForestRegressor(max_depth=10, random_state=0)
         rf.fit(X_train, y_train)

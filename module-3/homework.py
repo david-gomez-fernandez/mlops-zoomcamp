@@ -10,6 +10,8 @@ from prefect.task_runners import SequentialTaskRunner
 from datetime import datetime
 from dateutil.relativedelta import *
 
+import pickle
+
 
 @task
 def get_paths(date):
@@ -17,7 +19,7 @@ def get_paths(date):
     if date == None:
         date = datetime.today()           
     
-    date_input = datetime.strptime(date, "%Y-%m-%d")            
+    date_input = datetime.strptime(date, "%Y-%m-%d")
 
     train_path = '../data/fhv_tripdata_' + (date_input +  relativedelta(months = -2)).strftime('%Y-%m')  + '.parquet'
     val_path = '../data/fhv_tripdata_' + (date_input +  relativedelta(months = -1)).strftime('%Y-%m')  + '.parquet'
@@ -79,22 +81,32 @@ def run_model(df, categorical, dv, lr):
     logger.info(f"The MSE of validation is: {mse}")
     return
 
+@task
+def save_model (date, lr, dv):
+    with open('./models/model-' + date + '.bin', 'wb') as f_out:            
+        pickle.dump(lr, f_out)
+
+    with open('./models/dv-' + date + '.b', 'wb') as f_out:            
+        pickle.dump(dv, f_out)
+
 @flow(task_runner=SequentialTaskRunner())
 # def main(date=None):    
-def main(date='2021-03-15'):    
+def main(date='2021-08-15'):    
     
     categorical = ['PUlocationID', 'DOlocationID']
-
+    
     train_path, val_path = get_paths(date).result()
 
-    # df_train = read_data(train_path)
-    # df_train_processed = prepare_features(df_train, categorical)
+    df_train = read_data(train_path)
+    df_train_processed = prepare_features(df_train, categorical)
 
-    # df_val = read_data(val_path)
-    # df_val_processed = prepare_features(df_val, categorical, False)
+    df_val = read_data(val_path)
+    df_val_processed = prepare_features(df_val, categorical, False)
 
-    # # train the model
-    # lr, dv = train_model(df_train_processed, categorical).result()
-    # run_model(df_val_processed, categorical, dv, lr)
+    # train the model
+    lr, dv = train_model(df_train_processed, categorical).result()  
+    run_model(df_val_processed, categorical, dv, lr)
+    save_model(date, lr, dv)
+
 
 main()
