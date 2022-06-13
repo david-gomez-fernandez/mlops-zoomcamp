@@ -108,5 +108,16 @@ def main(date='2021-08-15'):
     run_model(df_val_processed, categorical, dv, lr)
     save_model(date, lr, dv)
 
+from prefect.deployments import DeploymentSpec
+from prefect.orion.schemas.schedules import IntervalSchedule, CronSchedule
+from prefect.flow_runners import SubprocessFlowRunner
+from datetime import timedelta
 
-main()
+DeploymentSpec(
+    flow=main,
+    name="module-3",    
+    schedule=CronSchedule(cron="0 9 15 * *"),
+    flow_runner=SubprocessFlowRunner(),
+    tags=["ml", "MLOps Zoomcamp"]
+)
+
